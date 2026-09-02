@@ -2,24 +2,27 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+/**
+ * Order matters: users before authored content, taxonomy before posts, projects before
+ * posts (a post may reference a project). Every seeder below is idempotent, so
+ * `db:seed` can be re-run on an existing database without duplicating rows.
+ */
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            AdminUserSeeder::class,
+            SiteSettingSeeder::class,
+            NavigationItemSeeder::class,
+            CategorySeeder::class,
+            TagSeeder::class,
+            TechnologySeeder::class,
+            PageSeeder::class,
+            ProjectSeeder::class,
+            PostSeeder::class,
         ]);
     }
 }
