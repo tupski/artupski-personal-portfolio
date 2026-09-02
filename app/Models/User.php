@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Enums\UserRole;
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -13,7 +15,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class User extends Authenticatable implements HasMedia
+class User extends Authenticatable implements FilamentUser, HasMedia
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, InteractsWithMedia, Notifiable;
@@ -86,6 +88,18 @@ class User extends Authenticatable implements HasMedia
             ->fit(Fit::Crop, 400, 400)
             ->format('webp')
             ->queued();
+    }
+
+    /**
+     * Determine if the user can access the Filament admin panel (spec §33, §34).
+     */
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return in_array($this->role->value, [
+            UserRole::SuperAdmin->value,
+            UserRole::Editor->value,
+            UserRole::Author->value,
+        ]);
     }
 
     /**
