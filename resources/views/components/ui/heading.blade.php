@@ -12,7 +12,7 @@ $sizes = [
     3 => 'text-[var(--text-xl)] leading-[1.45] tracking-tight font-semibold',
     4 => 'text-[var(--text-lg)] leading-[1.6] font-semibold',
 ];
-$classes = 'text-fg overflow-wrap-anywhere ' . ($sizes[(int) $level] ?? $sizes[2]);
+$classes = 'text-fg wrap-anywhere ' . ($sizes[(int) $level] ?? $sizes[2]);
 @endphp
 
 <div>

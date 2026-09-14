@@ -11,6 +11,7 @@
         "hotwired-laravel/turbo-laravel": "^2.6",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
+        "livewire/flux": "*",
         "spatie/laravel-medialibrary": "^11.23",
         "symfony/html-sanitizer": "^8.1"
     },

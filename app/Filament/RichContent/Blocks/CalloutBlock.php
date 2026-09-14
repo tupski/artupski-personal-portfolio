@@ -6,7 +6,21 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\RichEditor\RichContentCustomBlock;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Illuminate\Support\Str;
 
+/**
+ * Callout block.
+ *
+ * `toHtml()` output is injected into the public article body, so it has to obey the
+ * public design contract, not Filament's admin palette. The previous version used
+ * Tailwind's `blue-50` / `yellow-50` / `green-50` / `gray-50` plus emoji icons
+ * (💡 ⚠️ ✅ 📝), which broke three rules at once: hardcoded non-token colours (§2.6),
+ * and emoji standing in for icons (antislop R-04). Colour is now paired with an inline
+ * SVG so state never rests on colour alone (§9.7) and a reader with no emoji font
+ * still gets the meaning.
+ *
+ * `toPreviewHtml()` is admin-only, so it keeps Filament's neutral tokens.
+ */
 class CalloutBlock extends RichContentCustomBlock
 {
     public static function getId(): string
@@ -45,27 +59,42 @@ class CalloutBlock extends RichContentCustomBlock
         $type = $config['type'] ?? 'info';
         $content = e($config['content'] ?? '');
 
-        $colors = [
-            'info' => 'bg-blue-50 dark:bg-blue-900/30 border-blue-400',
-            'warning' => 'bg-yellow-50 dark:bg-yellow-900/30 border-yellow-400',
-            'tip' => 'bg-green-50 dark:bg-green-900/30 border-green-400',
-            'note' => 'bg-gray-50 dark:bg-gray-800 border-gray-400',
+        // Contract §2.6 tokens only. Each entry is: border/icon/text in both themes.
+        $variants = [
+            'info' => [
+                'fg' => 'var(--fg-muted)',
+                'border' => 'var(--line)',
+                'bg' => 'var(--bg-subtle)',
+                'icon' => 'M10 2a8 8 0 100 16 8 8 0 000-16zm0 3.5a1 1 0 110 2 1 1 0 010-2zm0 3.5a.75.75 0 01.75.75v4a.75.75 0 01-1.5 0v-4A.75.75 0 0110 9z',
+            ],
+            'note' => [
+                'fg' => 'var(--fg-muted)',
+                'border' => 'var(--line)',
+                'bg' => 'var(--bg-subtle)',
+                'icon' => 'M10 2a8 8 0 100 16 8 8 0 000-16zm0 3.5a1 1 0 110 2 1 1 0 010-2zm0 3.5a.75.75 0 01.75.75v4a.75.75 0 01-1.5 0v-4A.75.75 0 0110 9z',
+            ],
+            'warning' => [
+                'fg' => 'var(--warn)',
+                'border' => 'var(--warn)',
+                'bg' => 'var(--warn-soft)',
+                'icon' => 'M8.9 2.6a1.25 1.25 0 012.2 0l6.3 11.2A1.25 1.25 0 0116.3 16H3.7a1.25 1.25 0 01-1.1-2.2L8.9 2.6zM10 7a.75.75 0 00-.75.75v3a.75.75 0 001.5 0v-3A.75.75 0 0010 7zm0 6.5a.9.9 0 100 1.8.9.9 0 000-1.8z',
+            ],
+            'tip' => [
+                'fg' => 'var(--success)',
+                'border' => 'var(--success)',
+                'bg' => 'var(--success-soft)',
+                'icon' => 'M10 2a8 8 0 100 16 8 8 0 000-16zm3.8 6.03a.75.75 0 00-1.1-1.02l-3.2 3.45-1.4-1.35a.75.75 0 10-1.04 1.08l2 1.93a.75.75 0 001.06-.03l3.68-3.96z',
+            ],
         ];
 
-        $icons = [
-            'info' => '💡',
-            'warning' => '⚠️',
-            'tip' => '✅',
-            'note' => '📝',
-        ];
+        $v = $variants[$type] ?? $variants['info'];
 
-        $color = $colors[$type] ?? $colors['info'];
-        $icon = $icons[$type] ?? $icons['info'];
-
-        return '<div class="my-6 p-4 rounded-lg border-l-4 '.$color.'">'
-            .'<div class="flex items-start gap-2">'
-            .'<span class="text-lg">'.$icon.'</span>'
-            .'<div class="text-sm">'.nl2br($content).'</div>'
+        return '<div class="my-6 p-4 rounded-[var(--radius-lg)] border" style="border-color:'.$v['border']
+            .';background-color:'.$v['bg'].';color:'.$v['fg'].'">'
+            .'<div class="flex items-start gap-3">'
+            .'<svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="mt-0.5 shrink-0" width="18" height="18" style="color:'.$v['fg'].'">'
+            .'<path d="'.$v['icon'].'"/></svg>'
+            .'<div class="text-sm leading-relaxed">'.nl2br($content).'</div>'
             .'</div>'
             .'</div>';
     }
@@ -73,12 +102,10 @@ class CalloutBlock extends RichContentCustomBlock
     public static function toPreviewHtml(array $config): ?string
     {
         $type = $config['type'] ?? 'info';
-        $icons = ['info' => '💡', 'warning' => '⚠️', 'tip' => '✅', 'note' => '📝'];
-        $icon = $icons[$type] ?? '💡';
 
-        return '<div class="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg">'
-            .'<span class="text-lg">'.$icon.'</span> '
-            .'<span class="text-sm text-gray-600 dark:text-gray-300">'.e($config['content'] ?? '').'</span>'
+        return '<div class="p-3 bg-gray-100 dark:bg-white/5 rounded-lg">'
+            .'<span class="font-mono text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">'.e($type).'</span> '
+            .'<span class="text-sm text-gray-700 dark:text-gray-300">'.e(Str::limit($config['content'] ?? '', 80)).'</span>'
             .'</div>';
     }
 }

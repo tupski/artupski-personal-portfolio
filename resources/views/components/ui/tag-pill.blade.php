@@ -5,7 +5,7 @@
 ])
 
 @php
-$base = 'inline-flex items-center font-mono text-xs rounded-full transition-colors duration-120 overflow-wrap-anywhere';
+$base = 'inline-flex items-center font-mono text-xs rounded-full transition-colors duration-120 wrap-anywhere';
 $interactive = !$disabled && $href;
 
 $states = $active

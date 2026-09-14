@@ -6,7 +6,7 @@
 $heading = $data['heading'] ?? '';
 $text = $data['text'] ?? null;
 $buttonText = $data['button_text'] ?? '';
-$buttonUrl = $data['button_url'] ?? '#';
+$buttonUrl = $data['button_url'] ?? null;
 @endphp
 
 @if($heading)
@@ -15,11 +15,14 @@ $buttonUrl = $data['button_url'] ?? '#';
         @if($text)
             <p class="mt-2 text-sm text-fg-muted">{{ $text }}</p>
         @endif
-        @if($buttonText)
+
+        {{-- A CTA button with no destination would be a dead control (§R-26), so it is
+             only rendered when the editor supplied a URL. --}}
+        @if($buttonText && $buttonUrl)
             <div class="mt-4">
-                <x-ui.button href="{{ $buttonUrl }}" variant="primary">
+                <flux:button href="{{ $buttonUrl }}" variant="primary">
                     {{ $buttonText }}
-                </x-ui.button>
+                </flux:button>
             </div>
         @endif
     </div>

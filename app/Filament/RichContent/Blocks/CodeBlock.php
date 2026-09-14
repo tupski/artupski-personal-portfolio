@@ -55,15 +55,19 @@ class CodeBlock extends RichContentCustomBlock
         $title = $config['title'] ?? null;
         $language = e($config['language'] ?? 'php');
 
-        $html = '<div class="my-6 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">';
+        // Token-based so the editor's output matches resources/views/components/content/code-block.blade.php
+        // (§2.6). Note: no copy-button markup here — that is Stimulus-driven in the Blade
+        // component, and the editor's HTML is sanitized on save, so injecting a scripted
+        // control into article HTML would not survive and would be a dead control (R-26).
+        $html = '<div class="my-6 rounded-[var(--radius-lg)] overflow-hidden border border-[var(--line)]">';
 
         if ($title) {
-            $html .= '<div class="bg-gray-100 dark:bg-gray-800 px-4 py-2 text-xs font-mono text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">'
+            $html .= '<div class="bg-[var(--bg-muted)] px-4 py-2 font-mono text-xs text-[var(--fg-subtle)] border-b border-[var(--line)]">'
                 .e($title)
                 .'</div>';
         }
 
-        $html .= '<pre class="bg-gray-50 dark:bg-gray-900 p-4 overflow-x-auto text-sm"><code class="language-'.$language.'">'
+        $html .= '<pre class="bg-[var(--bg-subtle)] p-4 overflow-x-auto text-sm m-0"><code class="language-'.$language.' font-mono">'
             .$code
             .'</code></pre>'
             .'</div>';
@@ -76,9 +80,9 @@ class CodeBlock extends RichContentCustomBlock
         $title = e($config['title'] ?? 'Code');
         $language = e($config['language'] ?? '');
 
-        return '<div class="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg font-mono text-xs">'
-            .'<p class="text-gray-500 mb-1">'.$title.($language ? " ({$language})" : '').'</p>'
-            .'<pre class="text-gray-700 dark:text-gray-300 overflow-hidden">'.e(substr($config['code'] ?? '', 0, 60)).'…</pre>'
+        return '<div class="p-3 bg-gray-100 dark:bg-white/5 rounded-lg font-mono text-xs">'
+            .'<p class="text-gray-500 dark:text-gray-400 mb-1">'.$title.($language ? " ({$language})" : '').'</p>'
+            .'<pre class="text-gray-700 dark:text-gray-300 overflow-hidden">'.e(substr($config['code'] ?? '', 0, 60)).'</pre>'
             .'</div>';
     }
 }

@@ -35,7 +35,10 @@ class AdminPanelProvider extends PanelProvider
             ->emailVerification(false)
             ->darkMode(true)
             ->brandName('Artupski')
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->colors([
+                /* Retained so Filament's own palettes know the active hue; the actual
+                   ember ramp is defined in resources/css/filament/admin/theme.css. */
                 'primary' => Color::Amber,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')

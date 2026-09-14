@@ -6,6 +6,18 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\RichEditor\RichContentCustomBlock;
 use Filament\Forms\Components\TextInput;
 
+/**
+ * Call-to-action block.
+ *
+ * `toHtml()` lands in the public article body. The previous version rendered
+ * `bg-gradient-to-r from-amber-50 to-orange-50`, `rounded-xl` and a `bg-amber-500`
+ * button — a gradient fill, a 12px radius above the 10px ceiling and hardcoded
+ * non-token colours, each of which the public contract rejects on sight (§1, §2.4,
+ * §2.6). It is now a bordered `--bg-subtle` panel with the contract's inverted-neutral
+ * primary button, matching the CTA the public Blade block renders.
+ *
+ * The editor action still requires a button URL, so no dead control can reach the page.
+ */
 class CtaBlock extends RichContentCustomBlock
 {
     public static function getId(): string
@@ -40,23 +52,38 @@ class CtaBlock extends RichContentCustomBlock
     {
         $heading = e($config['heading'] ?? '');
         $text = e($config['text'] ?? '');
-        $buttonText = e($config['button_text'] ?? 'Learn more');
-        $buttonUrl = e($config['button_url'] ?? '#');
+        $buttonText = e($config['button_text'] ?? '');
+        $buttonUrl = e($config['button_url'] ?? '');
 
-        return '<div class="my-8 p-8 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl text-center border border-amber-200 dark:border-amber-800">'
-            .'<h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">'.$heading.'</h3>'
-            .($text ? '<p class="text-gray-600 dark:text-gray-300 mb-4">'.$text.'</p>' : '')
-            .'<a href="'.$buttonUrl.'" class="inline-block px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg transition-colors">'
-            .$buttonText
-            .'</a>'
-            .'</div>';
+        if ($heading === '') {
+            return null;
+        }
+
+        $html = '<div class="my-8 p-6 sm:p-8 border border-[var(--line)] bg-[var(--bg-subtle)] rounded-[var(--radius-lg)] text-center">'
+            .'<h3 class="text-[var(--text-xl)] font-semibold text-[var(--fg)] m-0">'.$heading.'</h3>';
+
+        if ($text !== '') {
+            $html .= '<p class="mt-2 text-sm text-[var(--fg-muted)]">'.$text.'</p>';
+        }
+
+        if ($buttonText !== '' && $buttonUrl !== '') {
+            // Inverted-neutral primary button, contract §2.6 DECISION.
+            $html .= '<p class="mt-4 mb-0">'
+                .'<a href="'.$buttonUrl.'" class="inline-flex items-center justify-center h-10 px-4 gap-2 text-sm font-medium '
+                .'no-underline rounded-[var(--radius-md)] border border-transparent '
+                .'bg-[var(--fg)] text-[var(--bg)] hover:bg-[var(--fg-muted)] transition-colors duration-120">'
+                .$buttonText
+                .'</a></p>';
+        }
+
+        return $html.'</div>';
     }
 
     public static function toPreviewHtml(array $config): ?string
     {
-        return '<div class="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-center border border-amber-200 dark:border-amber-800">'
-            .'<p class="font-bold text-sm">'.e($config['heading'] ?? '').'</p>'
-            .'<p class="text-xs text-gray-500 mt-1">Button: '.e($config['button_text'] ?? '').'</p>'
+        return '<div class="p-4 bg-gray-100 dark:bg-white/5 rounded-lg text-center">'
+            .'<p class="font-semibold text-sm text-gray-900 dark:text-white">'.e($config['heading'] ?? '').'</p>'
+            .'<p class="font-mono text-xs text-gray-500 dark:text-gray-400 mt-1">Button: '.e($config['button_text'] ?? '').'</p>'
             .'</div>';
     }
 }

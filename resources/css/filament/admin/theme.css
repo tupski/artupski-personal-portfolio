@@ -1,0 +1,93 @@
+/*
+ * Filament admin theme — artupski.
+ *
+ * Registered in AdminPanelProvider via ->viteTheme(). This is Filament's own
+ * supported extension point: it compiles through Filament's theme system and
+ * inherits the panel's CSS, so nothing here reaches into Filament internals or
+ * overrides its markup.
+ *
+ * Purpose is one thing only: make the admin read as the same brand as the public
+ * site — same typeface, same warm neutral, same accent, same radius ceiling —
+ * while staying recognisably an admin application. It does not restyle layout,
+ * density or component structure; that is Filament's job.
+ */
+
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+/* --- Typeface: the same self-hosted Inter the public site uses (§2.1) --- */
+@theme {
+    --font-sans: 'Inter var', 'Inter Fallback', ui-sans-serif, system-ui, -apple-system,
+        'Segoe UI', Arial, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
+
+    /* --- Radius ceiling carried over from the public contract (§2.4) ---
+       Filament's default control radius is 8px, which already sits under the 10px
+       ceiling, so only the outermost container steps are capped. */
+    --radius-xl: 10px;
+    --radius-2xl: 10px;
+    --radius-3xl: 10px;
+}
+
+/* --- Self-hosted font faces ---
+   Declared here as well as in app.css because the admin theme is a separate
+   CSS entry and does not load the public stylesheet. Paths are absolute
+   (`/fonts/...`) and resolve through public/, which is why Vite leaves them
+   alone at build time. */
+@font-face {
+    font-family: 'Inter var';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url('/fonts/InterVariable-latin.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Inter Fallback';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: local('Arial');
+    ascent-override: 90%;
+    descent-override: 22%;
+    line-gap-override: 0%;
+    size-adjust: 107%;
+}
+
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/fonts/JetBrainsMono-Regular.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('/fonts/JetBrainsMono-Bold.woff2') format('woff2');
+}
+
+/* --- Accent: contract ember, replacing the panel's previous Color::Amber ---
+   Filament exposes its palette as `--primary-*` custom properties. Setting them
+   here changes every Filament component that already reads them, instead of
+   targeting component markup. Light/dark steps are kept dark enough for the
+   contract's 4.5:1 body-text floor (§2.7); the lighter values are used only for
+   the darker half of the ramp, which carries borders and soft fills. */
+:root {
+    --primary-50: oklch(97% 0.014 41);
+    --primary-100: oklch(94.5% 0.03 41);
+    --primary-200: oklch(89% 0.06 41);
+    --primary-300: oklch(81% 0.1 41);
+    --primary-400: oklch(70% 0.145 41);
+    --primary-500: oklch(60% 0.175 41);
+    --primary-600: oklch(52% 0.175 41);
+    --primary-700: oklch(45% 0.16 41);
+    --primary-800: oklch(39% 0.135 41);
+    --primary-900: oklch(34% 0.11 41);
+    --primary-950: oklch(26% 0.08 41);
+}

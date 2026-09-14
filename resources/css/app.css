@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../../vendor/livewire/flux/dist/flux.css";
 
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
 @source "../../storage/framework/views/*.php";
@@ -215,6 +216,104 @@
 
 /* Custom dark variant — class-based (§2.8) */
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================================
+   FLUX UI BRIDGE (§2.4 radius ceiling, §2.6 palette)
+   ============================================================
+
+   Flux's stubs style themselves with hardcoded `zinc-*` utilities and
+   `rounded-xl` / `rounded-2xl`. Rather than publishing and rewriting Flux's
+   markup (fragile, re-opens on every upgrade), the theme variables those
+   utilities resolve to are redirected here, once:
+
+   - `zinc-*` -> the contract's warm-neutral stone ramp. Flux ships a cool
+     neutral; contract §2.6 mandates a warm base and forbids blue-grey.
+     The swap is 1:1 per step so Flux's own light/dark pairings stay coherent.
+   - `radius-xl` and above -> capped at the contract's 10px block ceiling (§2.4).
+     Flux's card and callout default to 12px, which would breach it.
+
+   Reason for each is written above the rule that applies it (R-31).
+   ============================================================ */
+
+@theme {
+  /* Warm-neutral remap — contract §2.6 "warm neutral (stone) base ... No blue-grey" */
+  --color-zinc-50: oklch(98.5% 0.001 106.423);
+  --color-zinc-100: oklch(97% 0.001 106.424);
+  --color-zinc-200: oklch(92.3% 0.003 48.717);
+  --color-zinc-300: oklch(86.9% 0.005 56.366);
+  --color-zinc-400: oklch(70.9% 0.01 56.259);
+  --color-zinc-500: oklch(55.3% 0.013 58.071);
+  --color-zinc-600: oklch(44.4% 0.011 73.639);
+  --color-zinc-700: oklch(37.4% 0.01 67.558);
+  --color-zinc-800: oklch(26.8% 0.007 34.298);
+  --color-zinc-900: oklch(21.6% 0.006 56.043);
+  --color-zinc-950: oklch(14.7% 0.004 49.25);
+
+  /* Radius ceiling — contract §2.4 "Hard ceiling 10px on any block container" */
+  --radius-xl: 10px;
+  --radius-2xl: 10px;
+  --radius-3xl: 10px;
+  --radius-4xl: 10px;
+}
+
+/* Flux accent triple -> contract §2.6 DECISION: primary button is inverted neutral
+   (`--fg` fill / `--bg` label), accent stays reserved for links and focus.
+   Written unlayered so it outranks the `@layer theme` block in flux.css. */
+:root {
+  --color-accent: var(--fg);
+  --color-accent-content: var(--accent);
+  --color-accent-foreground: var(--bg);
+}
+
+.dark {
+  --color-accent: var(--fg);
+  --color-accent-content: var(--accent);
+  --color-accent-foreground: var(--bg);
+}
+
+/* ------------------------------------------------------------
+   FLUX SURFACE POLICY (§2.5, FINISH GATE item 32)
+
+   Contract §2.5: "Nothing else casts a shadow" and "no inset highlight".
+   Flux ships two depth cues that breach it:
+     - `shadow-xs` on outline buttons, inputs and textareas
+     - `shadow-[inset_0px_1px_...]` on the primary button
+   Both are neutralised here rather than by overriding Flux's markup, so a Flux
+   upgrade cannot reintroduce them. `data-flux-*` is Flux's own public hook.
+   Focus is NOT affected: the contract's ring is an `outline` (§9.3), and Flux
+   does not set `outline-none` on any component.
+   ------------------------------------------------------------ */
+
+[data-flux-button],
+[data-flux-input],
+[data-flux-textarea],
+[data-flux-select],
+[data-flux-checkbox],
+[data-flux-radio],
+[data-flux-switch],
+[data-flux-card],
+[data-flux-callout],
+[data-flux-badge],
+[data-flux-heading],
+[data-flux-text],
+[data-flux-link],
+[data-flux-label],
+[data-flux-description],
+[data-flux-error],
+[data-flux-field],
+[data-flux-legend],
+[data-flux-subheading] {
+  box-shadow: none;
+}
+
+/* Overlays are the one place elevation is legitimate, so they keep a cue but take
+   the contract's own neutral token instead of Flux's default ramp (§2.5). */
+[data-flux-dropdown],
+[data-flux-tooltip],
+[data-flux-toast],
+[data-flux-modal] > dialog {
+  box-shadow: var(--shadow-overlay);
+}
 
 /* ============================================================
    TURBO PROGRESS BAR — restyled (§6.2)

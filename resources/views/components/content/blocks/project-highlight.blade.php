@@ -20,9 +20,9 @@ $project = $projectId ? \App\Models\Project::find($projectId) : null;
                 <p class="mt-1 text-sm text-fg-muted">{{ $project->short_description }}</p>
             @endif
             <div class="mt-3">
-                <x-ui.button href="/projects/{{ $project->slug }}" variant="secondary" size="sm">
+                <flux:button href="/projects/{{ $project->slug }}" variant="outline" size="sm">
                     View project
-                </x-ui.button>
+                </flux:button>
             </div>
         </div>
     </div>
