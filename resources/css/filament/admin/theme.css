@@ -14,6 +14,17 @@
 
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
 
+/* Flux component styles, admin only.
+   Importing flux.css brings the class definitions every `<flux:*>` component emits, and its
+   own `@source` directives scan Flux's core stubs plus the Pro stubs (140 templates), so Pro
+   components used in admin Blade are styled. This import is deliberately absent from
+   resources/css/app.css: the public bundle must not carry Pro's classes.
+
+   Filament does not define `--color-accent`, and Flux does not define `--primary-*`, so the
+   two palettes do not overwrite each other. Filament remains the owner of layout and of the
+   theme switcher; Flux only supplies component styles. */
+@import '../../../../vendor/livewire/flux/dist/flux.css';
+
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
 

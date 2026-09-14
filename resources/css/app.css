@@ -1,6 +1,13 @@
 @import "tailwindcss";
 @import "../../vendor/livewire/flux/dist/flux.css";
 
+/* flux.css declares `@source "../../flux-pro/stubs"`. That path stayed inert while Flux Pro
+   was absent; now that Pro is installed it resolves, and every class used inside Pro's 140
+   stub templates would be compiled into the PUBLIC stylesheet — for components the public
+   site never renders. The public bundle is excluded from that scan here. Admin gets the Pro
+   classes through its own theme entry, which scans the Pro stubs deliberately. */
+@source not "../../vendor/livewire/flux-pro/stubs";
+
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
 @source "../../storage/framework/views/*.php";
 
